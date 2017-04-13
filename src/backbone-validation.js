@@ -230,7 +230,7 @@ Backbone.Validation = (function(_){
         // Check to see if an attribute, an array of attributes or the
         // entire model is valid. Passing true will force a validation
         // of the model.
-        isValid: function(option) {
+        isValid: function(option, silent) {
           var flattened, attrs, error, invalidAttrs;
 
           option = option || getOptionsAttrs(options, view);
@@ -257,6 +257,11 @@ Backbone.Validation = (function(_){
             }, this);
           }
 
+          if (option && silent) {
+            this.validate(null, { silent: true });
+            return this._isValid;
+          }
+
           if(option === true) {
             invalidAttrs = this.validate();
           }
@@ -280,6 +285,8 @@ Backbone.Validation = (function(_){
               result = validateModel(model, allAttrs, _.pick(flattened, _.keys(validatedAttrs)));
 
           model._isValid = result.isValid;
+
+          if (opt.silent) { return result.invalidAttrs; }
 
           //After validation is performed, loop through all associated views
           _.each(model.associatedViews, function(view){
